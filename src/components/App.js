@@ -30,15 +30,13 @@ function App() {
 
   function handleEditProfileClick() {
     setIsEditProfilePopupOpen(true);
-    addKeyDownListener();
   }
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
-    addKeyDownListener();
   }
+
   function handleAddPlaceClick() {
     setIsAddPlacePopupOpen(true);
-    addKeyDownListener();
   }
 
   function closeAllPopups() {
@@ -46,27 +44,12 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard(null);
-    removeKeyDownListener();
   }
 
 
   function handleCardClick(card) {
     setSelectedCard(card);
   }
-
-  const handleEscClose = (evt) => {
-    if (evt.key === "Escape") {
-      closeAllPopups();
-    }
-  };
-
-  const addKeyDownListener = () => {
-    document.addEventListener("keydown", handleEscClose);
-  };
-
-  const removeKeyDownListener = () => {
-    document.removeEventListener("keydown", handleEscClose);
-  };
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
