@@ -1,39 +1,17 @@
-import { useEffect, useState } from "react";
-import api from "../utils/Api";
-import { Card } from "./Card";
+import React, { useContext } from 'react';
+import Card from "./Card";
+import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
-export const Main = ({ onEditProfile, onAddPlace, onEditAvatar,onCardClick }) => {
-  const [userData, setUserData] = useState({});
-  const [cards, setCards] = useState([]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const userData = await api.getProfile();
-        setUserData(userData);
-      } catch (err) {
-        console.log(err);
-      }
-    })();
-  }, [setUserData]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const userData = await api.getInitialCards();
-        setCards(userData);
-      } catch (err) {
-        console.log(err);
-      }
-    })();
-  }, [setCards]);
-
+function Main({ onEditProfile, onEditAvatar, onAddPlace, onCardClick, cards, onCardLike, onCardDelete }){
+  const currentUser = useContext(CurrentUserContext)
 
   return (
     <main className="content">
       <section className="profile">
         <div className="profile__avatar-container">
-          <img className="profile__avatar" src={userData.avatar} alt="аватарка пользователя" />
+          <img className="profile__avatar" src={currentUser.avatar} alt="аватарка пользователя" />
           <button
             type="button"
             aria-label="edit-avatar"
@@ -43,19 +21,21 @@ export const Main = ({ onEditProfile, onAddPlace, onEditAvatar,onCardClick }) =>
         </div>
         <div>
           <div className="profile__info">
-            <h1 className="profile__name">{userData.name}</h1>
+            <h1 className="profile__name">{currentUser.name}</h1>
             <button type="button" onClick={onEditProfile} className="profile__edit-button" />
           </div>
-          <p className="profile__description">{userData.about}</p>
+          <p className="profile__description">{currentUser.about}</p>
         </div>
-        <button type="button" value=" " onClick={onAddPlace} className="profile__add-button" />
+        <button type="button" aria-label="Добавить фото" className="profile__add-button" onClick={onAddPlace} />
       </section>
-      <section className="elements" aria-label="Картиночки красивых мест">
+      <section className="elements" aria-label="Картинки красивых мест">
 
         {cards.map((card) =>
         <Card key={card._id} 
         card={card} 
-        onCardClick={()=>onCardClick(card)}
+        onCardClick={onCardClick}
+        onCardLike={onCardLike}
+        onCardDelete={onCardDelete}
         />)}
 
       </section>

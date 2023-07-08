@@ -1,11 +1,15 @@
-import { Popup } from "./Popup";
-
-
-export const PopupWithForm = ({ name, title, submitButtonText, children, isOpen, onClose}) => {
+function PopupWithForm({name, title, submitButtonText, children, isOpen, onClose, onSubmit}) {
   return (
-    <Popup name={name} isOpen={isOpen} onClose={onClose}>
-      <h2 className="popup__title">{title}</h2>
-      <form className={`popup__form popup__form_${name}`} name={name} noValidate>
+     <div className={`popup popup_${name} ${isOpen&&'popup_opened'}`}>
+        <div className={`popup__container popup__container_${name}`}>
+          <button
+            type="button"
+            className="popup__close-icon"
+            aria-label="Close"
+            onClick={onClose}
+          ></button>
+          <h2 className="popup__title">{title}</h2>
+      <form className={`popup__form popup__form_${name}`} name={name} noValidate onSubmit={onSubmit}>
         {children}
         <button
           type="submit"
@@ -15,6 +19,9 @@ export const PopupWithForm = ({ name, title, submitButtonText, children, isOpen,
           {submitButtonText}
         </button>
       </form>
-    </Popup>
+        </div>
+      </div>
   );
 };
+
+export default PopupWithForm

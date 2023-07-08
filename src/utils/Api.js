@@ -23,14 +23,13 @@ class Api {
       }
     
       // change profile info on server
-      patchProfile({ name, about }) {
+      patchProfile(data) {
         return fetch(`${this._url}/users/me`, {
           method: 'PATCH',
           headers: this._headers,
-          body: JSON.stringify({
-            name,
-            about
-          }),
+          body: JSON.stringify(
+            { name: data.profileName, about: data.profileJob }
+          ),
         }).then(this._handleResponse);
       }
     
@@ -69,9 +68,9 @@ class Api {
         }).then(this._handleResponse);
       }
     
-      addLike(cardId) {
+      addLike(cardId, isLiked) {
         return fetch(`${this._url}/cards/${cardId}/likes`, {
-          method: 'PUT',
+          method: `${isLiked ? "DELETE" : "PUT"}`,
           headers: this._headers,
         }).then(this._handleResponse);
       }

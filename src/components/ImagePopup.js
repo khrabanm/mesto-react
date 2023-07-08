@@ -1,15 +1,18 @@
-import { Popup } from "./Popup";
-
-
-export const ImagePopup = ({name, isOpen, onClose, card}) => {
+function ImagePopup({card, onClose}) {
 
   return (
-    <Popup
-      name={name}
-      isOpen={isOpen}
-      onClose={onClose}
-    >
-        <img src={card.link}  className="popup__image" alt={card.name} />
-        <h2 className="popup__heading">{card.name}</h2>
-    </Popup>
+    <div className={`popup popup_image ${card ? 'popup_opened' : ''}`}>
+        <div className={`popup__container popup__container_image`}>
+          <button
+            type="button"
+            className="popup__close-icon"
+            aria-label="Close"
+            onClick={onClose}
+          ></button>
+          <img className="popup__image" src={card?.link} alt={card?.name} />
+        <h2 className="popup__heading">{card?.name}</h2>
+        </div>
+      </div>
   )};
+
+  export default ImagePopup
