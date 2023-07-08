@@ -21,144 +21,143 @@ function App() {
 
   useEffect(() => {
     Promise.all([api.getProfile(), api.getInitialCards()])
-        .then(([dataUserInfo, dataCard]) => {
-            setCurrentUser(dataUserInfo)
-            setCards(dataCard)
-        })
-        .catch((error) => { console.log(`Ошибка при загрузке страницы ${error}`) })
-}, [])
+      .then(([dataUserInfo, dataCard]) => {
+        setCurrentUser(dataUserInfo)
+        setCards(dataCard)
+      })
+      .catch((error) => { console.log(`Ошибка при загрузке страницы ${error}`) })
+  }, [])
 
-function handleEditProfileClick() {
-  setIsEditProfilePopupOpen(true);
-  addKeyDownListener();
-}
-function handleEditAvatarClick() {
-  setIsEditAvatarPopupOpen(true);
-  addKeyDownListener();
-}
-function handleAddPlaceClick() {
-  setIsAddPlacePopupOpen(true);
-  addKeyDownListener();
-}
-
-function closeAllPopups() {
-  setIsEditProfilePopupOpen(false);
-  setIsEditAvatarPopupOpen(false);
-  setIsAddPlacePopupOpen(false);
-  setSelectedCard(null);
-  removeKeyDownListener();
-
-}
-
-function handleCardClick(card) {
-  setSelectedCard(card);
-  addKeyDownListener();
-}
-
-const handleEscClose = (evt) => {
-  if (evt.key === "Escape") {
-    closeAllPopups();
+  function handleEditProfileClick() {
+    setIsEditProfilePopupOpen(true);
+    addKeyDownListener();
   }
-};
+  function handleEditAvatarClick() {
+    setIsEditAvatarPopupOpen(true);
+    addKeyDownListener();
+  }
+  function handleAddPlaceClick() {
+    setIsAddPlacePopupOpen(true);
+    addKeyDownListener();
+  }
 
-const addKeyDownListener = () => {
-  document.addEventListener("keydown", handleEscClose);
-};
+  function closeAllPopups() {
+    setIsEditProfilePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setSelectedCard(null);
+    removeKeyDownListener();
+  }
 
-const removeKeyDownListener = () => {
-  document.removeEventListener("keydown", handleEscClose);
-};
 
-function handleCardLike(card) {
-  // Снова проверяем, есть ли уже лайк на этой карточке
-  const isLiked = card.likes.some(i => i._id === currentUser._id);
-  // Отправляем запрос в API и получаем обновлённые данные карточки
-  api
+  function handleCardClick(card) {
+    setSelectedCard(card);
+  }
+
+  const handleEscClose = (evt) => {
+    if (evt.key === "Escape") {
+      closeAllPopups();
+    }
+  };
+
+  const addKeyDownListener = () => {
+    document.addEventListener("keydown", handleEscClose);
+  };
+
+  const removeKeyDownListener = () => {
+    document.removeEventListener("keydown", handleEscClose);
+  };
+
+  function handleCardLike(card) {
+    // Снова проверяем, есть ли уже лайк на этой карточке
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    // Отправляем запрос в API и получаем обновлённые данные карточки
+    api
       .addLike(card._id, isLiked)
       .then((newCard) => {
-          setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
       })
       .catch((error) => { console.log(`Ошибка при проставлении лайка ${error}`) })
-}
+  }
 
-function handleCardDelete(cardId) {
-  api
+  function handleCardDelete(cardId) {
+    api
       .deleteCard(cardId)
       .then(() => {
-          setCards(cards.filter((c) => c._id !== cardId))
+        setCards((state) => state.filter((item) => item._id !== cardId));
       })
       .catch((error) => { console.log(`Ошибка при при удалении фото ${error}`) })
-}
+  }
 
-function handleUpdateUser(dataUserInfo) {
-  api
+  function handleUpdateUser(dataUserInfo) {
+    api
       .patchProfile(dataUserInfo)
       .then((res) => {
-          setCurrentUser(res)
-          closeAllPopups()
+        setCurrentUser(res)
+        closeAllPopups()
       })
       .catch((error) => { console.log(`Ошибка при редактировании профиля ${error}`) })
 
-}
+  }
 
-function handleUpdateAvatar(dataUserInfo) {
-  api
+  function handleUpdateAvatar(dataUserInfo) {
+    api
       .setUserAvatar(dataUserInfo)
       .then((res) => {
-          setCurrentUser(res)
-          closeAllPopups()
+        setCurrentUser(res)
+        closeAllPopups()
       })
       .catch((error) => { console.log(`Ошибка при загрузки фото ${error}`) })
-}
+  }
 
-function handleAddPlaceSubmit(dataCard) {
-  api
+  function handleAddPlaceSubmit(dataCard) {
+    api
       .addCard(dataCard)
       .then((res) => {
-          setCards([res, ...cards])
-          closeAllPopups()
+        setCards([res, ...cards])
+        closeAllPopups()
       })
       .catch((error) => { console.log(`Ошибка при загрузки фото ${error}`) })
 
-}
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-  <div className="page">
-    <Header />
-    <Main 
-      onEditProfile={handleEditProfileClick}
-      onEditAvatar={handleEditAvatarClick}
-      onAddPlace={handleAddPlaceClick}
-      onCardClick={handleCardClick}
-      cards={cards}
-      onCardLike={handleCardLike}
-      onCardDelete={handleCardDelete}/>
-    <Footer />
-    <template id="element"></template>
-    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
-    <AddPlacePopup
-                    isOpen={isAddPlacePopupOpen}
-                    onClose={closeAllPopups}
-                    onAddPlace={handleAddPlaceSubmit}
-                />
-    <PopupWithForm
-      name='popup_delete'
-      title='Вы уверены?'
-      nameButton='Да'
-    />
-    <EditAvatarPopup
-      isOpen={isEditAvatarPopupOpen}
-      onClose={closeAllPopups}
-      onUpdateAvatar={handleUpdateAvatar}
-    />
-    <ImagePopup
-      card={selectedCard}
-      onClose={closeAllPopups}
-    />
-    </div>
-  </CurrentUserContext.Provider>
-    );
+      <div className="page">
+        <Header />
+        <Main
+          onEditProfile={handleEditProfileClick}
+          onEditAvatar={handleEditAvatarClick}
+          onAddPlace={handleAddPlaceClick}
+          onCardClick={handleCardClick}
+          cards={cards}
+          onCardLike={handleCardLike}
+          onCardDelete={handleCardDelete} />
+        <Footer />
+        <template id="element"></template>
+        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
+        <AddPlacePopup
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+          onAddPlace={handleAddPlaceSubmit}
+        />
+        <PopupWithForm
+          name='popup_delete'
+          title='Вы уверены?'
+          nameButton='Да'
+        />
+        <EditAvatarPopup
+          isOpen={isEditAvatarPopupOpen}
+          onClose={closeAllPopups}
+          onUpdateAvatar={handleUpdateAvatar}
+        />
+        <ImagePopup
+          card={selectedCard}
+          onClose={closeAllPopups}
+        />
+      </div>
+    </CurrentUserContext.Provider>
+  );
 }
 
 export default App;
